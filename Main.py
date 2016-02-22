@@ -1,10 +1,18 @@
 import BackupHandler
-import sys,getopt
-import optparse
+import argparse
 
-if __name__ == "__main__":
-    opts, args = getopt.getopt(sys.argv[1:], "h", ["conf=", "tftp=", "mibsrc="])
-    for option, value in opts:
-        if option is '-h':
-            sys.exit(0)
-        if option is ''
+
+class Entry:
+    def __init__(self):
+        configparser = argparse.ArgumentParser()
+        configparser.add_argument("--gconfig", help="Specify global configuration file with absolute path")
+        configparser.add_argument("--nodecsv", help="Specify node csv configuration file with absolute path")
+        configparser.add_argument("-d", "--debug", help="Logging detail information of the program",
+                                  action="store_true")
+        configparser.add_argument("-s", "--single", help="Backup single node config(use together with --ip)",
+                                  action="store_true")
+        configparser.add_argument("--ip", help="Specify single backup node ip", type=str)
+        self.args = configparser.parse_args()
+entry = Entry()
+backuphandler = BackupHandler.BackupHandler()
+backuphandler.startfullbackup()
