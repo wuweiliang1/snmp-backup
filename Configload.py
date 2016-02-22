@@ -11,8 +11,11 @@ class Config:
         if Main.entry.args.debug:
             logging.basicConfig(level=logging.DEBUG)
         if Main.entry.args.gconfig is True:
+            logging.info('Redirect the configuration file to' + Main.entry.args.gconfig)
             location = Main.entry.args.gconfig
-        if os.path.exists(location) is not True:
+        if os.path.exists(location) is True:
+            logging.INFO('Find Backup.conf in' + location)
+        else:
             logging.critical('Could not find the configuration file in ' + location)
             exit()
         # override the global config if specified in cli
