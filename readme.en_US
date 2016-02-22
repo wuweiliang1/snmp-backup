@@ -1,0 +1,43 @@
+Running Platform: Python 3.5
+Brief Using Guide:
+1.Configure your snmp-agent, in this case, the cisco Switch/Router, to allow the specific SNMP-Server to access your snmp-agent via ACL control:
+	Switch(config)#ip access-list standard snmp-access
+	Switch(config)#permit x.x.x.x
+
+2.Create a view for initialization of SNMP backup(only ccCopyTable included)
+	Switch(config)#snmp-server view myview ccCopyTable included
+	
+3.Specify the above view and ACL for a community, and grant the community full control on this table
+	Switch(config)#snmp-server community [MYCOMMUNITY] view myview RW snmp-access
+	
+4.If necessary, you can also limit the tftp destination using the following command:
+	Swtich(config)#snmp-server tftp-server-list MYACL
+	
+5.Open the /Conf/backup.conf and assign appropriate value to the settings. A simple configuration template is as follow:
+	[SNMP]
+	#should be the relevant path to the Main.py folder 
+	NODEConf = /Conf/ip.csv
+	#Agent SNMP listening port, 161 by default
+	SNMPPort = 161
+	#SNMP Community
+	Community= test-community
+	#3rd Party MIB library(in this case, the cisco CONFIG-COPY-MIB and no need to modify it)
+	MIBSrc = /3rdmib
+	#SNMP Mode(Change of this option is not supported in this version)
+	SNMPMode = v2c
+
+	[BACKUP]
+	#Protocol for backup(other options are not supported in this version. For examples, scp, ftp, etc.)
+	Protocol = tftp 
+	#TFTP Server Address
+	TFTPAddr= 192.168.20.22
+6.Modify the /conf/ip.csv ,A simple configuration template is as follow:
+	Nodeid,Nodename,Ipaddress,Nodetype,Nodelevel,Specification
+	1,gzSwitch,192.168.1.61,ciscoSwitch,Core,gz
+	2,shSwitch,192.168.1.62,ciscoSwitch,Core,sh
+Nodeid: an unique identification number of the node
+Nodename: name of the node
+ipaddress: management ip address of the node 
+Nodetype:Device Type of the node(you can assign arbitrary value in this version, as the script only support backup of cisco device. All device will be handled with the method of processing cisco device backup)
+NodeLevel:Device Level(Core, Dist, Access, etc. Option which is also not supported in this version)
+Specification:Device Specification, If you leave it empty, all backup file will be located at tftp://tftpaddr/BACKUPTIME. Otherwise, the backup file will be located at tftp://tftpaddr/BACKUPTIME/Specification subfolder. Ensure your tftp server have a privilege of creating a folder and touching a file.

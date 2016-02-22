@@ -1,0 +1,42 @@
+需要运行在python3.5下：
+使用方法：
+先在交换机配置SNMP-Server，配置ACL，允许对应的SNMP Server x.x.x.x采集数据
+	Switch(config)#ip access-list standard snmp-access
+	Switch(config)#permit x.x.x.x
+创建SNMP 视图myview，仅包含ccCopyTable表
+	Switch(config)#snmp-server view myview ccCopyTable included
+对指定的community 限制视图为myview，SNMP操作权限为读写，ACL指定为snmp-access
+	Switch(config)#snmp-server community [MYCOMMUNITY] view myview RW snmp-access
+如果需要，还可以指定可以访问的tftp服务器，其他服务器将被禁止（不设置的情况下，所有tftp服务器可以作为备份目标）
+	Swtich(config)#snmp-server tftp-server-list MYACL
+
+接着打开/conf/backup.conf文件，填写对应的SNMP设置和TFTP设置；
+配置模板如下：
+[SNMP]
+#所有路径是相对于Main脚本所在根目录的绝对路径
+NODEConf = /Conf/ip.csv
+#Agent SNMP监听端口号，默认为161
+SNMPPort = 161
+#SNMP v1和v2c中所指定的团队号
+Community= test-community
+#引用第三方mib库位置(一般无需修改)
+MIBSrc = /3rdmib
+#SNMP模式(暂时不可以修改)
+SNMPMode = v2c
+
+[BACKUP]
+#Beta版本仅支持使用tftp协议，后续会添加对FTP的支持
+Protocol = tftp 
+#TFTP设置地址，请确保地址已被
+TFTPAddr= 192.168.20.22
+最后用修改/conf/ip.csv文件，设置模板如下：
+Nodeid,Nodename,Ipaddress,Nodetype,Nodelevel,Specification
+1,gzSwitch,192.168.1.61,ciscoSwitch,Core,gz
+2,shSwitch,192.168.1.62,ciscoSwitch,Core,sh
+
+Nodeid:需要备份设备的ID号
+Nodename:需要备份设备的名称
+ipaddress:需要备份设备的管理IP地址
+Nodetype:指定设备类型（目前可随意设置，因并不支持除cisco以外设备的SNMP备份）
+NodeLevel:设备等级(留置待用)
+Specification:设备分类，用于在备份时创建子目录，如果留空，所有文件将会在tftp://备份时间的根目录下生成；若不留空，则会生成如tftp://备份时间/gz 和tftp://备份时间/sh 等目录，请确保TFTP程序有自行创建目录的权限。
