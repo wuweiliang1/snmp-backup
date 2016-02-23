@@ -1,5 +1,5 @@
 Running Platform: Python 3.5
-Brief Using Guide:
+Brief User Guide:
 1.Configure your snmp-agent, in this case, the cisco Switch/Router, to allow the specific SNMP-Server to access your snmp-agent via ACL control:
 	Switch(config)#ip access-list standard snmp-access
 	Switch(config)#permit x.x.x.x
