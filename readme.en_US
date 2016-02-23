@@ -31,7 +31,7 @@ Brief Using Guide:
 	Protocol = tftp 
 	#TFTP Server Address
 	TFTPAddr= 192.168.20.22
-6.Modify the /conf/ip.csv ,A simple configuration template is as follow:
+6.Modify the /conf/ip.csv. A simple configuration template is as follow:
 	Nodeid,Nodename,Ipaddress,Nodetype,Nodelevel,Specification
 	1,gzSwitch,192.168.1.61,ciscoSwitch,Core,gz
 	2,shSwitch,192.168.1.62,ciscoSwitch,Core,sh
