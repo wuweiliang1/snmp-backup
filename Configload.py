@@ -3,18 +3,20 @@ import csv
 import sys
 import os
 import logging
-import Main
+import argparse
 
 
 class Config:
     def __init__(self, location=sys.path[0] + '/Conf/backup.conf'):
-        if Main.entry.args.debug:
+        self.__cliargs = None
+        self.__readconfigfromcli()
+        if self.__cliargs.debug:
             logging.basicConfig(level=logging.DEBUG)
-        if Main.entry.args.gconfig is True:
-            logging.info('Redirect the configuration file to' + Main.entry.args.gconfig)
-            location = Main.entry.args.gconfig
+        if self.__cliargs.gconfig is True:
+            logging.info('Redirect the configuration file to' + self.__cliargs.gconfig)
+            location = self.__cliargs.gconfig
         if os.path.exists(location) is True:
-            logging.INFO('Find Backup.conf in' + location)
+            logging.info('Find Backup.conf in ' + location)
         else:
             logging.critical('Could not find the configuration file in ' + location)
             exit()
@@ -64,8 +66,8 @@ class Config:
         return self.__nodelist
 
     def loadcsv(self, nodecsv=sys.path[0] + '/Conf/node.csv'):
-        if Main.entry.args.nodecsv is True:
-            nodecsv = Main.entry.args.nodecsv
+        if self.__cliargs.nodecsv is True:
+            nodecsv = self.__cliargs.nodecsv
         if os.path.exists(nodecsv) is not True:
             logging.critical('Could not find the node csv file in ' + nodecsv)
         nodecsv = nodecsv
@@ -73,3 +75,11 @@ class Config:
             nodereader = csv.DictReader(ipcsv, delimiter=',')
             for noderow in nodereader:
                 self.__nodelist.append(noderow)
+
+    def __readconfigfromcli(self):
+        argparser = argparse.ArgumentParser()
+        argparser.add_argument("--gconfig", help="Specify global configuration file with absolute path")
+        argparser.add_argument("--nodecsv", help="Specify node csv configuration file with absolute path")
+        argparser.add_argument("-d", "--debug", help="Logging detail information of the program",
+                               action="store_true")
+        self.__cliargs = argparser.parse_args()

@@ -5,7 +5,6 @@ import time
 # Program Include
 import Configload
 import logging
-import os
 
 
 class BackupHandler:
@@ -14,7 +13,7 @@ class BackupHandler:
         # if os.path.exists(starttime + '/log/Backup.log') is not True:
         #     with open(starttime + '/log/Backup.log', 'w') as f:
         #         f.close()
-        logging.basicConfig(filename='log/' + starttime + '.log', filemode='w', level=logging.WARNING,
+        logging.basicConfig(filename='log/' + starttime + '.log', filemode='w', level=logging.DEBUG,
                             format='%(asctime)s %(filename)s [line:%(lineno)d] %(levelname)s %(message)s')
         self.__config = Configload.Config()
         self.__folder = starttime
